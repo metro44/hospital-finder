@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="container py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image src="/hospital-svgrepo-com.svg" alt="" width={24} height={24} />
+            <Image src="/hospital.svg" alt="" width={24} height={24} />
             <span className="font-bold text-white">Hospital Finder</span>
           </div>
         </div>
@@ -17,9 +17,6 @@ export default function Footer() {
           Facility data from OpenStreetMap · routing by openrouteservice · map by Google
           </p>
           <div className="flex items-center gap-3">
-            <a href="https://twitter.com/mech_44" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="hover:opacity-80 transition-all">
-              <Image src="/icons/Twitter.svg" alt="Twitter" width={24} height={24} className="icon-white" />
-            </a>
             <a href="https://linkedin.com/in/martins-chinwuba-50ab4935a" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:opacity-80 transition-all">
               <Image src="/icons/Linkedin.svg" alt="LinkedIn" width={24} height={24} className="icon-white" />
             </a>

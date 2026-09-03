@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: 'Hospital Finder',
   description:
     'Locate hospitals and healthcare facilities near you, search by name or medical service, and get directions on an interactive map.',
-  icons: { icon: '/hospital-svgrepo-com.svg' },
+  icons: { icon: '/hospital.svg' },
   openGraph: {
     title: 'Hospital Finder',
     description:

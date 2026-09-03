@@ -12,7 +12,7 @@ export default function Header() {
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-blue/10">
-            <Image src="/hospital-svgrepo-com.svg" alt="" width={20} height={20} className="h-5 w-5" />
+            <Image src="/hospital.svg" alt="" width={20} height={20} className="h-5 w-5" />
           </span>
           <span className="text-[15px] font-semibold tracking-tight text-slate-900">
             Hospital<span className="text-slate-400"> Finder</span>
