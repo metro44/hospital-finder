@@ -1,0 +1,31 @@
+// Datasource pointing to Neon/PostgreSQL. Uses user's DATA env var.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATA")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// A hospital a signed-in user has saved. `placeId` holds the OSM id
+// ("node/123456"); lat/lng let saved hospitals be plotted on the map.
+model Bookmark {
+  id         String   @id @default(cuid())
+  userId     String   // Clerk user ID
+  placeId    String
+  name       String
+  address    String?
+  phone      String?
+  website    String?
+  rating     Float?
+  vicinity   String?
+  lat        Float?
+  lng        Float?
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, placeId], name: "user_place_unique")
+  @@index([userId])
+}
+
+
