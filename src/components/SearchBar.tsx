@@ -25,6 +25,8 @@ interface SearchBarProps {
   biasPoint?: { lat: number; lng: number } | null;
   countryCode?: string;
   countryName?: string;
+  /** Shrinks padding and hides the heading / city chips while the list is scrolled. */
+  compact?: boolean;
 }
 
 const RADIUS_OPTIONS = [2, 5, 8, 15, 25, 40];
@@ -40,6 +42,7 @@ export default function SearchBar({
   biasPoint,
   countryCode,
   countryName,
+  compact = false,
 }: SearchBarProps) {
   const [nameInput, setNameInput] = useState(value.q);
   const [cityInput, setCityInput] = useState('');
@@ -85,21 +88,35 @@ export default function SearchBar({
   };
 
   const locating = locationStatus === 'locating';
+  const controlSize = compact ? 'middle' : 'large';
 
   return (
-    <div className="surface p-4 sm:p-5">
-      <div className="flex items-baseline justify-between">
-        <h2 className="text-[15px] font-semibold text-slate-900">Find a hospital</h2>
-        {locationLabel && (
-          <span className="hidden max-w-[55%] items-center gap-1 truncate text-xs text-slate-500 sm:flex">
-            <MapPin className="h-3 w-3 shrink-0 text-primary-blue" />
-            <span className="truncate">around {locationLabel}</span>
-          </span>
-        )}
+    <div
+      className={`surface transition-[padding] duration-300 ${compact ? 'p-3' : 'p-4 sm:p-5'}`}
+    >
+      <div
+        className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ${
+          compact ? 'grid-rows-[0fr] mb-0 opacity-0' : 'grid-rows-[1fr] mb-0 opacity-100'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-[15px] font-semibold text-slate-900">Find a hospital</h2>
+            {locationLabel && (
+              <span className="hidden max-w-[55%] items-center gap-1 truncate text-xs text-slate-500 sm:flex">
+                <MapPin className="h-3 w-3 shrink-0 text-primary-blue" />
+                <span className="truncate">around {locationLabel}</span>
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Location */}
-      <form onSubmit={submitCity} className="mt-3 flex flex-col gap-2 sm:flex-row">
+      <form
+        onSubmit={submitCity}
+        className={`flex flex-col gap-2 sm:flex-row ${compact ? 'mt-0' : 'mt-3'}`}
+      >
         <LocationAutocomplete
           value={cityInput}
           onChange={setCityInput}
@@ -109,22 +126,24 @@ export default function SearchBar({
           }}
           near={biasPoint}
           placeholder="City, area or address"
+          size={controlSize}
           aria-label="Search area"
         />
         <Button
           type="default"
-          size="large"
+          size={controlSize}
           htmlType="button"
           onClick={onUseMyLocation}
           loading={locating}
           icon={!locating ? <Crosshair className="h-4 w-4" /> : undefined}
           className="shrink-0"
+          aria-label="Use my location"
         >
-          {locating ? 'Locating' : 'Use my location'}
+          {compact ? null : locating ? 'Locating' : 'Use my location'}
         </Button>
       </form>
 
-      {locationStatus === 'denied' && !locationLabel && (
+      {locationStatus === 'denied' && !locationLabel && !compact && (
         <Alert
           className="mt-2"
           type="warning"
@@ -135,8 +154,8 @@ export default function SearchBar({
 
       {/* Name search */}
       <Input.Search
-        className="mt-3"
-        size="large"
+        className={compact ? 'mt-2' : 'mt-3'}
+        size={controlSize}
         allowClear
         placeholder="Search by hospital name"
         value={nameInput}
@@ -146,9 +165,9 @@ export default function SearchBar({
       />
 
       {/* Filters */}
-      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className={`grid grid-cols-1 gap-2 sm:grid-cols-2 ${compact ? 'mt-2' : 'mt-3'}`}>
         <Select
-          size="large"
+          size={controlSize}
           value={value.service || undefined}
           placeholder="Any medical service"
           allowClear
@@ -156,7 +175,7 @@ export default function SearchBar({
           options={SERVICE_OPTIONS.map((s) => ({ value: s.value, label: s.label }))}
         />
         <Select
-          size="large"
+          size={controlSize}
           value={value.radiusKm}
           disabled={value.mode === 'name'}
           onChange={(v) => onChange({ ...value, radiusKm: v })}
@@ -165,20 +184,26 @@ export default function SearchBar({
       </div>
 
       {popularCities.length > 0 && (
-        <div className="mt-4">
-          <p className="mb-2 text-xs font-medium text-slate-500">
-            Popular cities{countryName ? ` in ${countryName}` : ''}
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {popularCities.map((city) => (
-              <Tag
-                key={city}
-                className="cursor-pointer select-none border-0 px-2.5 py-1 text-xs transition-colors hover:!bg-blue-50 hover:!text-primary-blue"
-                onClick={() => onPickCity(countryName ? `${city}, ${countryName}` : city)}
-              >
-                {city}
-              </Tag>
-            ))}
+        <div
+          className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ${
+            compact ? 'mt-0 grid-rows-[0fr] opacity-0' : 'mt-4 grid-rows-[1fr] opacity-100'
+          }`}
+        >
+          <div className="overflow-hidden">
+            <p className="mb-2 text-xs font-medium text-slate-500">
+              Popular cities{countryName ? ` in ${countryName}` : ''}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {popularCities.map((city) => (
+                <Tag
+                  key={city}
+                  className="cursor-pointer select-none border-0 px-2.5 py-1 text-xs transition-colors hover:!bg-blue-50 hover:!text-primary-blue"
+                  onClick={() => onPickCity(countryName ? `${city}, ${countryName}` : city)}
+                >
+                  {city}
+                </Tag>
+              ))}
+            </div>
           </div>
         </div>
       )}

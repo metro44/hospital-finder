@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <body>
           <AntdRegistry>
             <Providers>
-              <div className="flex min-h-screen flex-col">
+              <div className="flex min-h-screen flex-col gap-8 sm:gap-10">
                 <div className="flex-1">{children}</div>
                 <Footer />
               </div>

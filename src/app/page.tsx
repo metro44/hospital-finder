@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { App, Button, Empty, Result, Segmented } from 'antd';
 import { List as ListIcon, Map as MapIcon } from 'lucide-react';
@@ -40,6 +40,8 @@ export default function Home() {
 
   const [isDesktop, setIsDesktop] = useState(false);
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
+  const [searchCompact, setSearchCompact] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
@@ -48,6 +50,23 @@ export default function Home() {
     mq.addEventListener('change', sync);
     return () => mq.removeEventListener('change', sync);
   }, []);
+
+  const syncSearchCompactFromList = useCallback(() => {
+    const el = listRef.current;
+    if (!el) return;
+    setSearchCompact(el.scrollTop > 20);
+  }, []);
+
+  useEffect(() => {
+    if (isDesktop) {
+      syncSearchCompactFromList();
+      return;
+    }
+    const onWin = () => setSearchCompact(window.scrollY > 48);
+    onWin();
+    window.addEventListener('scroll', onWin, { passive: true });
+    return () => window.removeEventListener('scroll', onWin);
+  }, [isDesktop, syncSearchCompactFromList]);
 
   // Country detection for the "popular cities" chips.
   useEffect(() => {
@@ -257,8 +276,8 @@ export default function Home() {
       );
     }
     return (
-      <div className="space-y-2.5">
-        <p className="px-1 text-[13px] text-slate-500">
+      <div className="space-y-4">
+        <p className="sticky top-0 z-10 bg-[var(--color-bg)] px-1 pb-3 pt-0.5 text-[13px] text-slate-500">
           <span className="font-semibold text-slate-700">{hospitals.length}</span>{' '}
           {hospitals.length === 1 ? 'facility' : 'facilities'}
           {areaLabel ? ` near ${areaLabel}` : ''}
@@ -289,8 +308,12 @@ export default function Home() {
       <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6">
         <div className="lg:flex lg:items-start lg:gap-5">
           {/* Left column — search stays put, only the list scrolls (lg+) */}
-          <div className="space-y-4 lg:sticky lg:top-[4.5rem] lg:flex lg:h-[calc(100vh-5.5rem)] lg:w-[400px] lg:shrink-0 lg:flex-col lg:space-y-0">
-            <div className="lg:shrink-0">
+          <div
+            className={`space-y-4 lg:sticky lg:top-[4.5rem] lg:flex lg:h-[calc(100vh-5.5rem)] lg:w-[400px] lg:shrink-0 lg:flex-col lg:space-y-0 ${
+              searchCompact ? 'lg:gap-3' : 'lg:gap-6'
+            }`}
+          >
+            <div className="relative z-20 lg:shrink-0">
               <SearchBar
                 value={search}
                 onChange={setSearch}
@@ -302,6 +325,7 @@ export default function Home() {
                 biasPoint={location}
                 countryCode={countryCode}
                 countryName={countryName}
+                compact={searchCompact}
               />
             </div>
 
@@ -332,7 +356,11 @@ export default function Home() {
             )}
 
             {(isDesktop || mobileView === 'list') && (
-              <div className="scrollbar-thin pb-2 lg:mt-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1.5">
+              <div
+                ref={listRef}
+                onScroll={syncSearchCompactFromList}
+                className="scrollbar-thin pb-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1.5"
+              >
                 {resultsPanel}
               </div>
             )}
